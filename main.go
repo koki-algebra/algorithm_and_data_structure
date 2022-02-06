@@ -1,89 +1,74 @@
 package main
 
 import (
-	"algorithm_and_data_structure/algorithm/sort"
+	"algorithm_and_data_structure/data_structure"
 	"bufio"
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 )
 
-func printTrumps(trumps []sort.Trump) {
-	for i := 0; i < len(trumps); i++ {
-		if i != len(trumps)-1 {
-			fmt.Printf("%s%d ", trumps[i].Suit.String(), trumps[i].Value)
-		} else {
-			fmt.Printf("%s%d\n", trumps[i].Suit.String(), trumps[i].Value)
-		}
-	}
-}
-
 func main() {
-	var (
-		N int
-		err error
-		suit sort.Suit
-		value int
-		trumps []sort.Trump
-	)
-	
 	sc := bufio.NewScanner(os.Stdin)
-	sc.Split(bufio.ScanWords)
+	// sc.Split(bufio.ScanWords)
 
-	// カードの枚数読み込み
+	var (
+		s data_structure.Stack
+		// inputs []string
+	)
+
+	// Stack initialize
+	s.Initialize()
+
 	if sc.Scan() {
-		N, err = strconv.Atoi(sc.Text())
-		if err != nil {
-			panic(err)
+		for _, c := range strings.Split(sc.Text(), " ") {
+			switch c {
+			case "+":
+				x, err := s.Pop()
+				if err != nil {
+					panic(err)
+				}
+				y, err := s.Pop()
+				if err != nil {
+					panic(err)
+				}
+				s.Push(y+x)
+			case "-":
+				x, err := s.Pop()
+				if err != nil {
+					panic(err)
+				}
+				y, err := s.Pop()
+				if err != nil {
+					panic(err)
+				}
+				s.Push(y-x)
+			case "*":
+				x, err := s.Pop()
+				if err != nil {
+					panic(err)
+				}
+				y, err := s.Pop()
+				if err != nil {
+					panic(err)
+				}
+				s.Push(y*x)
+			default:
+				n, err := strconv.Atoi(c)
+				if err != nil {
+					panic(err)
+				}
+				if err := s.Push(n); err != nil {
+					panic(err)
+				}
+			}
 		}
 	}
 
-	// カード読み込み
-	for i := 0; i < N; i++ {
-		if sc.Scan() {
-			str := sc.Text()
-			if len(str) != 2 {
-				fmt.Println("invalid input")
-				os.Exit(1)
-			}
-
-			// 絵柄(suit)を判別
-			switch string(str[0]) {
-			case "S":
-				suit = sort.S
-			case "H":
-				suit = sort.H
-			case "C":
-				suit = sort.C
-			case "D":
-				suit = sort.D
-			}
-
-			// 数字(value)を取得
-			value, err = strconv.Atoi(string(str[1]))
-			if err != nil {
-				panic(err)
-			}
-
-			trumps = append(trumps, sort.Trump{Suit: suit, Value: value})
-		}
+	x, err := s.Pop()
+	if err != nil {
+		panic(err)
 	}
-
-	// スライスをコピー
-	trumps2 := make([]sort.Trump, len(trumps))
-	copy(trumps2, trumps)
-
-	// バブルソート実行
-	sort.TrumpBubbleSort(trumps)
-	printTrumps(trumps)
-	fmt.Println("Stable")
-
-	// 選択ソート実行
-	sort.TrumpSelectionSort(trumps2)
-	printTrumps(trumps2)
-	if &trumps != &trumps2 {
-		fmt.Println("Not stable")
-	} else {
-		fmt.Println("Stable")
-	}
+	fmt.Println(x)
 }
